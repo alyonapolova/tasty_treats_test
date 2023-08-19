@@ -131,8 +131,8 @@ function handleCategory(e) {
   }
 }
 
-refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
-
+//refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
+refs.inputEl.addEventListener('input', handleInputEl);
 function handleInputEl(e) {
   const inputValue = e.target.value;
 
