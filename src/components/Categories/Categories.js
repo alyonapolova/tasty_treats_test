@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { axiosRecipes } from './axiosCards';
+import { axiosRecipes } from './axiosFilters';
+import { axiosCard } from './axiosCard';
 
 const BASE_URL = 'https://tasty-treats-backend.p.goit.global/api/';
 const categoriesRef = 'categories';
@@ -23,7 +24,7 @@ axiosRecipesInstance.getFilteredData(categoriesRef).then(categories => {
     const liEl = document.createElement('li');
     liEl.textContent = category.name;
     //console.log(category.name);
-    liEl.setAttribute('data-id', category._id);
+    liEl.setAttribute('value', category.name);
     liEl.classList.add('category-item');
     //console.log(category._id);
     refs.categoriesEl.append(liEl);
@@ -63,46 +64,82 @@ function selectTime() {
 selectTime();
 
 //Отримуємо обрані значення
+let selectedCategoryId;
+let selectedAreaId;
+let selectedIngredientsId;
+let selectedTimeId;
+let inputValue;
 
 refs.categoriesEl.addEventListener('click', handleCategory);
 
 function handleCategory(e) {
-  //console.log(e.target);
   if (e.target.classList.contains('category-item')) {
-    const categoryId = e.target.getAttribute('data-id');
+    selectedCategoryId = e.target.getAttribute('value');
+    axiosCardInstance.category = selectedCategoryId;
 
-    console.log('categoryId:', categoryId);
+    console.log(selectedCategoryId);
+    axiosCardInstance.getCardData().then(data => {
+      console.log('це рецепти', data);
+    });
   }
 }
 
 refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
-//refs.inputEl.addEventListener('input', handleInputEl);
+
 function handleInputEl(e) {
-  const inputValue = e.target.value;
-  array.push(inputValue);
-  //console.log('inputValue:', inputValue);
+  inputValue = e.target.value;
+  axiosCardInstance.tags = inputValue;
+  console.log(inputValue);
+  axiosCardInstance.getCardData().then(data => {
+    console.log('це рецепти', data);
+  });
 }
 
 refs.areaEl.addEventListener('change', handleArea);
 
 function handleArea(e) {
-  const selectedAreaId = e.target.value;
-
+  selectedAreaId = e.target.value;
+  axiosCardInstance.area = selectedAreaId;
   console.log('areaId:', selectedAreaId);
+  axiosCardInstance.getCardData().then(data => {
+    console.log('це рецепти', data);
+  });
 }
 
 refs.timeEl.addEventListener('change', handleTime);
 
 function handleTime(e) {
-  const selectedTimeId = e.target.value;
-
+  selectedTimeId = e.target.value;
+  axiosCardInstance.time = selectedTimeId;
   console.log('timeId:', selectedTimeId);
+  axiosCardInstance.getCardData().then(data => {
+    console.log('це рецепти', data);
+  });
 }
 
 refs.ingredientsEl.addEventListener('change', handleIngredients);
 
 function handleIngredients(e) {
-  const selectedIngredientsId = e.target.value;
+  selectedIngredientsId = e.target.id;
 
+  axiosCardInstance.ingredients = selectedIngredientsId;
   console.log('ingredientsId:', selectedIngredientsId);
+  axiosCardInstance.getCardData().then(data => {
+    console.log('це рецепти', data);
+  });
 }
+
+//Вибір рецепту по фільтрам
+const axiosCardInstance = new axiosCard();
+//console.log(axiosCardInstance);
+
+axiosCardInstance.category = selectedCategoryId;
+axiosCardInstance.page = 1;
+axiosCardInstance.time = selectedTimeId;
+axiosCardInstance.area = selectedAreaId;
+axiosCardInstance.ingredients = selectedIngredientsId;
+axiosCardInstance.tags = inputValue;
+
+axiosCardInstance.getCardData().then(data => {
+  console.log('Обрані рецепти', data);
+});
