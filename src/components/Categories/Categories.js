@@ -1,15 +1,10 @@
 import axios from 'axios';
-import debounce from 'lodash/debounce';
+import { axiosRecipes } from './axiosCards';
 
 const BASE_URL = 'https://tasty-treats-backend.p.goit.global/api/';
-//https://tasty-treats-backend.p.goit.global/api/areas;
-// https://tasty-treats-backend.p.goit.global/api/categories;
-// https://tasty-treats-backend.p.goit.global/api/recipes/
-
-const categories = 'categories';
-const time = 'recipes'; //треба взяти тут time
-const area = 'areas';
-const ingredients = 'ingredients';
+const categoriesRef = 'categories';
+const areaRef = 'areas';
+const ingredientsRef = 'ingredients';
 
 const refs = {
   categoriesEl: document.querySelector('.categories-list'),
@@ -19,23 +14,10 @@ const refs = {
   ingredientsEl: document.querySelector('.ingredients-select'),
 };
 
-function filtersData(filters) {
-  return axios
-    .get(`${BASE_URL}${filters}`)
-    .then(response => {
-      //console.log(`${filters}`, response.data);
-      return response.data;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-}
-// filtersData(categories);
-// filtersData(time);
-// filtersData(area);
-// filtersData(ingredients);
+const axiosRecipesInstance = new axiosRecipes();
+// Додаємо option
 
-filtersData(categories).then(categories => {
+axiosRecipesInstance.getFilteredData(categoriesRef).then(categories => {
   //console.log('category', categories);
   categories.forEach(category => {
     const liEl = document.createElement('li');
@@ -48,7 +30,7 @@ filtersData(categories).then(categories => {
   });
 });
 
-filtersData(area).then(areas => {
+axiosRecipesInstance.getFilteredData(areaRef).then(areas => {
   //console.log('areas', areas);
   areas.forEach(area => {
     const optionEl = document.createElement('option');
@@ -59,7 +41,7 @@ filtersData(area).then(areas => {
   });
 });
 
-filtersData(ingredients).then(ingredients =>
+axiosRecipesInstance.getFilteredData(ingredientsRef).then(ingredients =>
   ingredients.forEach(ingredient => {
     const optionEl = document.createElement('option');
     optionEl.value = ingredient.name;
@@ -69,53 +51,16 @@ filtersData(ingredients).then(ingredients =>
   })
 );
 
-let allRecipes = [];
-async function processAllPages(recipes) {
-  const response = await filtersData('recipes?page=1');
-  const totalPages = response.totalPages;
-
-  // console.log(totalPages);
-
-  allRecipes.push(...response.results);
-
-  for (let page = 2; page <= totalPages; page += 1) {
-    const pageResponse = await filtersData(`recipes?page=${page}`);
-    const recipes = pageResponse.results;
-
-    allRecipes.push(...recipes);
-    //console.log(pageResponse);
+function selectTime() {
+  for (let i = 5; i <= 120; i += 5) {
+    const optionEl = document.createElement('option');
+    optionEl.textContent = [i];
+    optionEl.value = [i];
+    refs.timeEl.appendChild(optionEl);
   }
-
-  return allRecipes;
 }
 
-//console.log(allRecipes);
-
-processAllPages(time)
-  .then(allRecipes => {
-    allRecipes.forEach(recipe => {
-      //console.log(recipe);
-      const optionEl = document.createElement('option');
-      optionEl.value = recipe.time;
-      optionEl.id = recipe._id;
-      optionEl.textContent = recipe.time + 'min';
-      refs.timeEl.appendChild(optionEl);
-    });
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-
-//Обєкт в який будуть додаватись значення
-
-const params = {
-  // page: 1,
-  // limit: 6,
-  categoryId: null,
-  areaId: null,
-  timeId: null,
-  ingredientsId: null,
-};
+selectTime();
 
 //Отримуємо обрані значення
 
@@ -126,17 +71,16 @@ function handleCategory(e) {
   if (e.target.classList.contains('category-item')) {
     const categoryId = e.target.getAttribute('data-id');
 
-    params.categoryId = categoryId;
     console.log('categoryId:', categoryId);
   }
 }
 
-//refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
-refs.inputEl.addEventListener('input', handleInputEl);
+refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
+//refs.inputEl.addEventListener('input', handleInputEl);
 function handleInputEl(e) {
   const inputValue = e.target.value;
-
-  console.log('inputValue:', inputValue);
+  array.push(inputValue);
+  //console.log('inputValue:', inputValue);
 }
 
 refs.areaEl.addEventListener('change', handleArea);
@@ -144,7 +88,6 @@ refs.areaEl.addEventListener('change', handleArea);
 function handleArea(e) {
   const selectedAreaId = e.target.value;
 
-  params.areaId = selectedAreaId;
   console.log('areaId:', selectedAreaId);
 }
 
@@ -153,7 +96,6 @@ refs.timeEl.addEventListener('change', handleTime);
 function handleTime(e) {
   const selectedTimeId = e.target.value;
 
-  params.timeId = selectedTimeId;
   console.log('timeId:', selectedTimeId);
 }
 
@@ -162,8 +104,5 @@ refs.ingredientsEl.addEventListener('change', handleIngredients);
 function handleIngredients(e) {
   const selectedIngredientsId = e.target.value;
 
-  params.ingredientsId = selectedIngredientsId;
   console.log('ingredientsId:', selectedIngredientsId);
 }
-
-console.log('params:', params);
