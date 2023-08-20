@@ -13,6 +13,8 @@ const refs = {
   timeEl: document.querySelector('.time-select'),
   areaEl: document.querySelector('.area-select'),
   ingredientsEl: document.querySelector('.ingredients-select'),
+  btnAllCategoriesEl: document.querySelector('.btn-categories'),
+  resetFilter: document.querySelector('.reset-filter'),
 };
 
 const axiosRecipesInstance = new axiosRecipes();
@@ -45,7 +47,7 @@ axiosRecipesInstance.getFilteredData(areaRef).then(areas => {
 axiosRecipesInstance.getFilteredData(ingredientsRef).then(ingredients =>
   ingredients.forEach(ingredient => {
     const optionEl = document.createElement('option');
-    optionEl.value = ingredient.name;
+    optionEl.value = ingredient._id;
     optionEl.id = ingredient._id;
     optionEl.textContent = ingredient.name;
     refs.ingredientsEl.appendChild(optionEl);
@@ -88,7 +90,7 @@ refs.inputEl.addEventListener('input', _.debounce(handleInputEl, 300));
 
 function handleInputEl(e) {
   inputValue = e.target.value;
-  axiosCardInstance.tags = inputValue;
+  axiosCardInstance.title = inputValue;
   console.log(inputValue);
   axiosCardInstance.getCardData().then(data => {
     console.log('це рецепти', data);
@@ -120,8 +122,8 @@ function handleTime(e) {
 refs.ingredientsEl.addEventListener('change', handleIngredients);
 
 function handleIngredients(e) {
-  selectedIngredientsId = e.target.id;
-
+  selectedIngredientsId = e.target.value;
+  console.log(e.target.value);
   axiosCardInstance.ingredients = selectedIngredientsId;
   console.log('ingredientsId:', selectedIngredientsId);
   axiosCardInstance.getCardData().then(data => {
@@ -138,8 +140,33 @@ axiosCardInstance.page = 1;
 axiosCardInstance.time = selectedTimeId;
 axiosCardInstance.area = selectedAreaId;
 axiosCardInstance.ingredients = selectedIngredientsId;
-axiosCardInstance.tags = inputValue;
+axiosCardInstance.title = inputValue;
 
 axiosCardInstance.getCardData().then(data => {
   console.log('Обрані рецепти', data);
 });
+
+//Скинути категорії
+refs.btnAllCategoriesEl.addEventListener('click', displayAllCategories);
+
+function displayAllCategories(e) {
+  console.log(e.target);
+  axiosCardInstance.category = '';
+  axiosCardInstance.time = selectedTimeId;
+  axiosCardInstance.area = selectedAreaId;
+  axiosCardInstance.ingredients = selectedIngredientsId;
+  axiosCardInstance.title = inputValue;
+  console.log(axiosCardInstance);
+}
+
+//Cкинути фільтри
+refs.resetFilter.addEventListener('click', resetAllFilters);
+
+function resetAllFilters() {
+  axiosCardInstance.category = selectedCategoryId;
+  axiosCardInstance.area = '';
+  axiosCardInstance.time = '';
+  axiosCardInstance.ingredients = '';
+  axiosCardInstance.title = '';
+  console.log(axiosCardInstance);
+}

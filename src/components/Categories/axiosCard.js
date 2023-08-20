@@ -4,11 +4,12 @@ export class axiosCard {
   BASE_URL = 'https://tasty-treats-backend.p.goit.global/api/recipes/';
 
   page = 1;
-  ingredients = null;
-  category = null;
+
+  category = '';
   area = null;
-  time = 45;
-  tags = null;
+  time = null;
+  ingredients = null;
+  title = null;
 
   async getCardData() {
     try {
@@ -19,7 +20,7 @@ export class axiosCard {
           time: this.time,
           area: this.area,
           ingredient: this.ingredients,
-          tags: this.tags,
+          title: this.title,
         },
       });
       //console.log('response.data', response.data);
