@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { axiosRecipes } from './axiosFilters';
 import { axiosCard } from './axiosCard';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const BASE_URL = 'https://tasty-treats-backend.p.goit.global/api/';
 const categoriesRef = 'categories';
@@ -80,9 +81,7 @@ function handleCategory(e) {
     axiosCardInstance.category = selectedCategoryId;
 
     console.log(selectedCategoryId);
-    axiosCardInstance.getCardData().then(data => {
-      console.log('це рецепти', data);
-    });
+    showNoRecipes();
   }
 }
 
@@ -92,9 +91,7 @@ function handleInputEl(e) {
   inputValue = e.target.value;
   axiosCardInstance.title = inputValue;
   console.log(inputValue);
-  axiosCardInstance.getCardData().then(data => {
-    console.log('це рецепти', data);
-  });
+  showNoRecipes();
 }
 
 refs.areaEl.addEventListener('change', handleArea);
@@ -103,9 +100,7 @@ function handleArea(e) {
   selectedAreaId = e.target.value;
   axiosCardInstance.area = selectedAreaId;
   console.log('areaId:', selectedAreaId);
-  axiosCardInstance.getCardData().then(data => {
-    console.log('це рецепти', data);
-  });
+  showNoRecipes();
 }
 
 refs.timeEl.addEventListener('change', handleTime);
@@ -114,9 +109,7 @@ function handleTime(e) {
   selectedTimeId = e.target.value;
   axiosCardInstance.time = selectedTimeId;
   console.log('timeId:', selectedTimeId);
-  axiosCardInstance.getCardData().then(data => {
-    console.log('це рецепти', data);
-  });
+  showNoRecipes();
 }
 
 refs.ingredientsEl.addEventListener('change', handleIngredients);
@@ -126,8 +119,16 @@ function handleIngredients(e) {
   console.log(e.target.value);
   axiosCardInstance.ingredients = selectedIngredientsId;
   console.log('ingredientsId:', selectedIngredientsId);
+
+  showNoRecipes();
+}
+function showNoRecipes() {
   axiosCardInstance.getCardData().then(data => {
     console.log('це рецепти', data);
+    const totalPages = data.totalPages;
+    if (totalPages === null) {
+      Notify.info("😪 We don't have recipes for your request!");
+    }
   });
 }
 
@@ -143,7 +144,7 @@ axiosCardInstance.ingredients = selectedIngredientsId;
 axiosCardInstance.title = inputValue;
 
 axiosCardInstance.getCardData().then(data => {
-  console.log('Обрані рецепти', data);
+  console.log('Recipes', data);
 });
 
 //Скинути категорії
@@ -163,7 +164,7 @@ function displayAllCategories(e) {
 refs.resetFilter.addEventListener('click', resetAllFilters);
 
 function resetAllFilters() {
-  axiosCardInstance.category = selectedCategoryId;
+  //axiosCardInstance.category = selectedCategoryId;
   axiosCardInstance.area = '';
   axiosCardInstance.time = '';
   axiosCardInstance.ingredients = '';
